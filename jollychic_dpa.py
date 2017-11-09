@@ -35,40 +35,42 @@ def get_index_data(url):
     product_list = soup.select('#J-pro-list > li')
 
     for product in product_list:
-        # print i
-        # 产品名字
-        product_name = product.select('a > h5')[0].get_text()
-        # print product_name
+        # fb_id
+        fb_id = product.attrs['data-gid']
+        # print fb_id
 
-        # 产品链接
-        product_link = product.select('a')[0].attrs['href']
-        # print product_link
+        # fb_title
+        fb_title = product.select('a > h5')[0].get_text()
+        # print fb_title
 
-        # 心愿数
+        # fb_price
+        try:
+            fb_price = product.find_all('span')[1].get_text()
+            fb_price = re.findall(r'\$(.*)', fb_price)[0]+' USD'
+        except Exception:
+            fb_price = ''
+        # print fb_price
+
+        # fb_link
+        fb_link = product.select('a')[0].attrs['href']
+        # print fb_link
+
+        # fb_image_link
+        fb_image_link = product.select('img.J-lazy-load.firstImg')[0].attrs['data-original'].split('_')[0]
+        # print fb_image_link
+
+        # add_wish
         add_wish = product.find_all('span')[0].get_text()
         # print add_wish
 
-        # 折扣价
-        try:
-            discount_price = product.find_all('span')[1].get_text()
-        except Exception:
-            discount_price = ''
-        # print discount_price
-
-        # 原价
-        try:
-            original_price = product.find_all('span')[2].get_text()
-        except Exception:
-            original_price = ''
-        # print original_price
-
         # 数据打包
         data = {
-            'product_name': product_name,
-            'product_link': product_link,
+            'id': fb_id,
+            'title': fb_title,
+            'price': fb_price,
+            'link': fb_link,
+            'image_link': fb_image_link,
             'add_wish': add_wish,
-            'discount_price': discount_price,
-            'original_price': original_price,
         }
         print data
         df_data = pd.DataFrame(data, index=[0])
@@ -85,8 +87,7 @@ print 'Create directory nav.'
 
 # 初始化最终dataframe
 df_res = pd.DataFrame(
-    columns=[u'add_wish', u'discount_price', u'original_price', u'product_link', u'product_name', u'header_block',
-             u'nav_item'])
+    columns=[u'add_wish', u'id', u'image_link', u'link', u'price', u'title', u'header_block', u'nav_item'])
 for i in range(2, 9):
     # 导航栏分类
     nav_item = \
@@ -96,7 +97,7 @@ for i in range(2, 9):
 
     # 初始化nav分类dataframe
     df_nav = pd.DataFrame(
-        columns=[u'add_wish', u'discount_price', u'original_price', u'product_link', u'product_name', u'header_block'])
+        columns=[u'add_wish', u'id', u'image_link', u'link', u'price', u'title', u'header_block'])
     header_block_list = soup.select(
         'body > div.header-nav-wrap > ul > li:nth-of-type({i}) > div > div > dl > dd > a'.format(i=i))
     for header_block_item in header_block_list:
@@ -111,7 +112,7 @@ for i in range(2, 9):
 
             # 初始化index信息dataframe
             df = pd.DataFrame(
-                columns=[u'add_wish', u'discount_price', u'original_price', u'product_link', u'product_name'])
+                columns=[u'add_wish', u'id', u'image_link', u'link', u'price', u'title'])
             url_list = create_urllist(header_block_link)
             for page_num, url in enumerate(url_list):
                 get_index_data(url)

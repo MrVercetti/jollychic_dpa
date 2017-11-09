@@ -5,6 +5,7 @@ __author__ = "DonQ"
 
 from bs4 import BeautifulSoup
 import pandas as pd
+import re
 
 with open('hehe.html', 'r') as web_data:
     soup = BeautifulSoup(web_data, 'lxml')
@@ -24,6 +25,7 @@ with open('hehe.html', 'r') as web_data:
         # fb_price
         try:
             fb_price = product.find_all('span')[1].get_text()
+            fb_price = re.findall(r'\$(.*)', fb_price)[0]+' USD'
         except Exception:
             fb_price = ''
         # print fb_price
