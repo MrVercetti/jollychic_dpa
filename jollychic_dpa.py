@@ -46,7 +46,7 @@ def get_index_data(url):
         # fb_price
         try:
             fb_price = product.find_all('span')[1].get_text()
-            fb_price = re.findall(r'\$(.*)', fb_price)[0]+' USD'
+            fb_price = re.findall(r'\$(.*)', fb_price)[0] + ' USD'
         except Exception:
             fb_price = ''
         # print fb_price
@@ -136,5 +136,9 @@ for i in range(2, 9):
     df_res = pd.concat([df_res, df_nav], axis=0, ignore_index=True)
     print '{nav_item}, Done!'.format(nav_item=nav_item)
 
-df_res.to_csv(os.path.join(get_desktop(), 'jollychic_data.csv'), index=False, encoding='utf-8')
+df_res['description'] = df_res['brand'] = 'jollychic'
+df_res['availability'] = 'in stock'
+df_res['condition'] = 'new'
+
+df_res.to_csv(os.path.join(get_desktop(), 'jollychic_dpa.csv'), index=False, encoding='utf-8')
 print 'ALL DONE!'
