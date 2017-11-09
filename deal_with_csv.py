@@ -4,15 +4,12 @@
 __author__ = "DonQ"
 
 import pandas as pd
+import _winreg
+import os
 
-df = pd.read_csv('jollychic test.csv')
+def get_desktop():
+    key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
+                          r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders')
+    return _winreg.QueryValueEx(key, "Desktop")[0].encode('utf-8')
 
-print df
-
-df_dpa = pd.DataFrame(
-    columns=[u'id', u'title', u'description', u'availability', u'condition', u'price', u'link', u'image_link', u'brand',
-             u'additional_image_link', u'age_group', u'color', u'gender', u'item_group_id', u'google_product_category',
-             u'material',
-             u'pattern', u'product_type', u'sale_price', u'sale_price_effective_date', u'shipping', u'shipping_weight',
-             u'size',
-             u'custom_label_0', u'custom_label_1', u'custom_label_2', u'custom_label_3', u'custom_label_4'])
+df = pd.read_csv(os.path.join(get_desktop(), 'jollychic_dpa.csv'), encoding='utf-8')
